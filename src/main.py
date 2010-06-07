@@ -22,8 +22,13 @@ class HomeHandler(webapp.RequestHandler):
 class FeedHandler(webapp.RequestHandler):
     """Request handler to generate the RSS feed"""
     def get(self, *args):
-        self.response.headers.add_header('Content-Type', 'application/xml')
-        self.response.out.write(gisthub.get_feed(args[0]))
+        feed = gisthub.get_feed(args[0])
+        if feed is not 'error':
+            self.response.headers.add_header('Content-Type', 'application/xml')
+            self.response.out.write(gisthub.get_feed(args[0]))
+        else:
+            self.response.headers.add_header('Content-Type', 'text/html')
+            self.response.out.write("<h1>Errorz. Bad Username?</h1>")
 
 class Redir(webapp.RequestHandler):
     """Form does a post to here with the github username.

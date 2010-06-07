@@ -87,6 +87,8 @@ def get_feed(username):
     url = "http://gist.github.com/api/v1/json/gists/%s" % username
     result = urlfetch.fetch(url)
     if result.status_code == 200 :
+        if result.content == 'error':
+            return 'error'
         feed = []
         feed.append("<rss version='2.0'>")
         feed.append("<channel>")
@@ -99,7 +101,6 @@ def get_feed(username):
                     """ % username)
         feed.append("<pubDate>%s</pubDate>" 
                     % strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
-
         obj = jsonpickle.decode(result.content)
         for i in range(0, len(obj['gists']) if len(obj['gists']) < 10 else 10):
             gist = obj['gists'][i]
