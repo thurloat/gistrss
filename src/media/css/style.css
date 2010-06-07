@@ -1,0 +1,75 @@
+
+body {
+margin:0;
+padding:0;
+background-color:#fff;
+background-image:url(../images/body-bg.jpg);
+background-repeat:repeat-x;
+}
+
+div#container {
+width:419px;
+margin:0 auto;
+}
+
+div#box {
+width:419px;
+float:left;
+height:151px;
+background-image:url(/media/images/main-bg.jpg);
+background-repeat:no-repeat;
+text-align:center;
+margin-top:200px;
+}
+
+div#box input.input-field {
+width:324px;
+height:29px;
+float:left;
+border:none;
+background-image:url(/media/images/input-bg.jpg);
+background-repeat:no-repeat;
+padding:0 0 0 5px;
+margin:33px 0 20px 44px;
+font-family:Helvetica, Arial, sans-serif;
+font-weight:700;
+color:#fa9300;
+font-size:16px;
+}
+
+#submit {
+display:block;
+width:88px;
+height:45px;
+text-decoration:none;
+overflow:hidden;
+background-image:url(/media/images/go-btn.jpg);
+background-repeat:no-repeat;
+margin:0 auto;
+float:none!important;
+}
+
+div#container a img {
+float:right;
+margin-top:3px;
+}
+
+#submit:hover {
+background-position:0 -45px;
+}
+
+#submit:active {
+background-position:0 -44px;
+}
+
+#submit {
+border:none;
+}
+div#box p{
+position:relative;
+top:-20px;
+left:0;
+height:0px;
+margin:0;
+padding:0;
+}
