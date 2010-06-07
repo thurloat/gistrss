@@ -1,0 +1,12 @@
+application: gistrss
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /favicon.ico
+  static_files: media/favicon.ico
+  upload: media/favicon.ico
+
+- url: /.*
+  script: main.py
