@@ -97,6 +97,7 @@ def get_feed(username):
         if result.content == 'error':
             return 'error'
         feed = []
+#        feed.append("""<?xml version="1.0" encoding="UTF-8"?>""")
         feed.append("<rss version='2.0'>")
         feed.append("<channel>")
         feed.append("<title>%s's Gists</title>" 
@@ -115,7 +116,7 @@ def get_feed(username):
             feed.append("<item>")
             feed.append("<author>%s</author>" % username)
             feed.append("<title>%s</title>" % 
-                        gist['description'] 
+                        html_escape(gist['description'])
                             if gist['description'] is not None 
                             else ', '.join(gist['files']))
             feed.append("""
