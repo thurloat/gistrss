@@ -72,4 +72,19 @@ left:0;
 height:0px;
 margin:0;
 padding:0;
+color:#a0a0a0;
+font-size:14px;
+font-family:Helvetica, Arial, sans-serif;
+font-weight:700;
+}
+
+a {
+color:#fa9300;
+font-size:14px;
+font-weight:700;
+font-family:Helvetica, Arial, sans-serif;
+}
+
+a:hover {
+color:#a0a0a0;
 }
