@@ -15,6 +15,8 @@ from google.appengine.api import urlfetch
 from time import gmtime, strftime
 from dateutil.parser import parse
 
+import logging
+
 def memoize(keyformat, time=60):
     """Decorator to memoize functions using memcache."""
     def decorator(fxn):
@@ -56,7 +58,9 @@ def get_raw(files, repo):
         try:
             result = urlfetch.fetch(url)
         except urlfetch.DownloadError:
-            raise Exception
+            result = urlfetch.fetch(url)
+            logging.error("Died on get_raw(%s)", url)
+            
         raw.append("""
             <table width='100%%'><tr><th style='background-color: #DDDDDD;'>
             """)
@@ -91,8 +95,9 @@ def get_feed(username):
     try:
         result = urlfetch.fetch(url)
     except urlfetch.DownloadError:
-        raise Exception
-    
+        result = urlfetch.fetch(url)
+        logging.error("Died on get_feed(%s)", url)
+        
     if result.status_code == 200 :
         if result.content == 'error':
             return 'error'

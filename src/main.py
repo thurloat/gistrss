@@ -27,6 +27,7 @@ class FeedHandler(webapp.RequestHandler):
         except Exception:
             self.response.headers.add_header('Content-Type', 'text/html')
             self.response.out.write("<h1>GitHub API is slow...</h1>")
+            return
         if feed is not 'error':
             self.response.headers.add_header('Content-Type', 'application/xml')
             self.response.out.write(gisthub.get_feed(args[0]))
