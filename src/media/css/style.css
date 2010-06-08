@@ -3,7 +3,7 @@ body {
 margin:0;
 padding:0;
 background-color:#fff;
-background-image:url(../images/body-bg.jpg);
+background-image:url(/media/images/body-bg.jpg);
 background-repeat:repeat-x;
 }
 
