@@ -53,7 +53,10 @@ def get_raw(files, repo):
     for i in range(0, len(files) if len(files) < 6 else 5):
         gist = files[i]
         url = "http://gist.github.com/raw/%s/%s" % (repo, urllib2.quote(gist))
-        result = urlfetch.fetch(url)
+        try:
+            result = urlfetch.fetch(url)
+        except urlfetch.DownloadError:
+            raise Exception
         raw.append("""
             <table width='100%%'><tr><th style='background-color: #DDDDDD;'>
             """)
@@ -85,7 +88,11 @@ def get_feed(username):
     """
     
     url = "http://gist.github.com/api/v1/json/gists/%s" % username
-    result = urlfetch.fetch(url)
+    try:
+        result = urlfetch.fetch(url)
+    except urlfetch.DownloadError:
+        raise Exception
+    
     if result.status_code == 200 :
         if result.content == 'error':
             return 'error'

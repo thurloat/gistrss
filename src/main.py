@@ -22,7 +22,11 @@ class HomeHandler(webapp.RequestHandler):
 class FeedHandler(webapp.RequestHandler):
     """Request handler to generate the RSS feed"""
     def get(self, *args):
-        feed = gisthub.get_feed(args[0])
+        try:
+            feed = gisthub.get_feed(args[0])
+        except Exception:
+            self.response.headers.add_header('Content-Type', 'text/html')
+            self.response.out.write("<h1>GitHub API is slow...</h1>")
         if feed is not 'error':
             self.response.headers.add_header('Content-Type', 'application/xml')
             self.response.out.write(gisthub.get_feed(args[0]))
