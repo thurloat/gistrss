@@ -116,9 +116,9 @@ def get_feed(username):
             feed.append("<item>")
             feed.append("<author>%s</author>" % username)
             feed.append("<title>%s</title>" % 
-                        html_escape(gist['description'])
+                        html_escape(gist['description']
                             if gist['description'] is not None 
-                            else ', '.join(gist['files']))
+                            else ', '.join(gist['files'])))
             feed.append("""
                 <description>
                     <div style="width: 100%%;">
