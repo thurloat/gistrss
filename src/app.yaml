@@ -1,5 +1,5 @@
 application: gistrss
-version: 1
+version: pygments
 runtime: python
 api_version: 1
 
