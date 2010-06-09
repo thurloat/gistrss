@@ -6,16 +6,19 @@ GistRSS - Generates a valid RSS/Atom feed for a github user's gist history.
 @author: Adam Thurlow <thurloat>
 @contact: thurloat <at> gmail <dot> com
 """
-import jsonpickle
-jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
 
-import urllib2
-from google.appengine.api import memcache
-from google.appengine.api import urlfetch
-from time import gmtime, strftime
 from dateutil.parser import parse
-
+from google.appengine.api import memcache, urlfetch
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.formatters.html import escape_html
+from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
+from time import gmtime, strftime
+import jsonpickle
 import logging
+import urllib2
+
+jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
 
 def memoize(keyformat, time=60):
     """Decorator to memoize functions using memcache."""
@@ -33,17 +36,8 @@ def memoize(keyformat, time=60):
         return wrapper
     return decorator
 
-def html_escape(text):
-    """does a string replace on html characters"""
-    text = text.replace('&', '&amp;')
-    text = text.replace('"', '&quot;')
-    text = text.replace("'", '&#39;')
-    text = text.replace(">", '&gt;')
-    text = text.replace("<", '&lt;')
-    return text
-
-
-@memoize("raw: %s %s", time=120)
+#TODO: Optimize cache length
+@memoize("raw: %s %s", time=240)
 def get_raw(files, repo):
     """
     Head to GitHub and get the raw content of the gist
@@ -52,6 +46,7 @@ def get_raw(files, repo):
     """
     
     raw = []
+    formatter = HtmlFormatter(noclasses=True)
     for i in range(0, len(files) if len(files) < 6 else 5):
         gist = files[i]
         url = "http://gist.github.com/raw/%s/%s" % (repo, urllib2.quote(gist))
@@ -70,22 +65,36 @@ def get_raw(files, repo):
             raw.append("""
                 <tr><td style='background-color: ghostWhite; color: black'>
                 """)
-            raw.append(u'<pre>')
-            pre_str = unicode(
-                              result.content 
+#TODO: DELETE CODES
+#            raw.append(u'<pre>')
+            #LEXERS
+            try:
+                lexer = get_lexer_for_filename(gist)
+            except Exception as exc:
+                logging.error("%s", exc)
+                lexer = get_lexer_by_name('text')
+            pre_str = highlight(result.content 
                                 if len(result.content) < 3000 
-                                else "%s... more on github" 
-                                    % result.content[0:2999], 
-                              errors='ignore')
-            raw.append(html_escape(pre_str))
-            raw.append(u'</pre>')
+                                else "%s........" 
+                                    % result.content[0:2999], lexer, formatter)
+#TODO: DELETE CODES -- OLD      
+#            pre_str = unicode(
+#                              result.content 
+#                                if len(result.content) < 3000 
+#                                else "%s... more on github" 
+#                                    % result.content[0:2999], 
+#                              errors='ignore')
+#            raw.append(html_escape(pre_str))
+            raw.append(pre_str)
+#            raw.append(u'</pre>')
             raw.append("</td></tr>")
         raw.append("</table>")
         raw.append("<hr />")
             
     return ''.join(raw)
 
-@memoize("feed: %s", time=500)
+#TODO: boost cache back up to 500
+@memoize("feed: %s", time=60)
 def get_feed(username):
     """
     Uses the github gist API and constructs an RSS feed for it
@@ -121,7 +130,7 @@ def get_feed(username):
             feed.append("<item>")
             feed.append("<author>%s</author>" % username)
             feed.append("<title>%s</title>" % 
-                        html_escape(gist['description']
+                        escape_html(gist['description']
                             if gist['description'] is not None 
                             else ', '.join(gist['files'])))
             feed.append("""
