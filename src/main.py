@@ -6,9 +6,11 @@ GistRSS - Generates a valid RSS/Atom feed for a github user's gist history.
 @author: Adam Thurlow <thurloat>
 @contact: thurloat <at> gmail <dot> com
 """
+
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+import logging
 import gisthub
 import os
 
@@ -24,7 +26,8 @@ class FeedHandler(webapp.RequestHandler):
     def get(self, *args):
         try:
             feed = gisthub.get_feed(args[0])
-        except Exception:
+        except Exception as exc:
+            logging.error("%s", exc)
             self.response.headers.add_header('Content-Type', 'text/html')
             self.response.out.write("<h1>GitHub API is slow...</h1>")
             return
