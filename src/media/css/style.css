@@ -12,7 +12,7 @@ width:419px;
 margin:0 auto;
 }
 
-div#box {
+div.box {
 width:419px;
 float:left;
 height:151px;
@@ -21,8 +21,19 @@ background-repeat:no-repeat;
 text-align:center;
 margin-top:200px;
 }
+div.bottom{
+margin-top: 50px;	
+}
+div.box table{
+	width: 400px;
+	text-align: center;	
+	padding: 10px;
+}
+div.box td{
+	padding: 10px;	
+}
 
-div#box input.input-field {
+div.box input.input-field {
 width:324px;
 height:29px;
 float:left;
@@ -65,7 +76,7 @@ background-position:0 -44px;
 #submit {
 border:none;
 }
-div#box p{
+div.box p{
 position:relative;
 top:-22px;
 left:0;
@@ -83,6 +94,7 @@ color:#fa9300;
 font-size:14px;
 font-weight:700;
 font-family:Helvetica, Arial, sans-serif;
+outline: none;
 }
 
 a:hover {

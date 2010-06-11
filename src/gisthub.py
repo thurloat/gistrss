@@ -37,7 +37,7 @@ def memoize(keyformat, time=60):
     return decorator
 
 #TODO: Optimize cache length
-@memoize("raw: %s %s", time=240)
+@memoize("raw: %s %s", time=1200)
 def get_raw(files, repo):
     """
     Head to GitHub and get the raw content of the gist
@@ -70,8 +70,8 @@ def get_raw(files, repo):
             #LEXERS
             try:
                 lexer = get_lexer_for_filename(gist)
-            except Exception as exc:
-                logging.error("%s", exc)
+            except Exception:
+#                logging.error("%s", exc)
                 lexer = get_lexer_by_name('text')
             pre_str = highlight(result.content 
                                 if len(result.content) < 3000 
@@ -94,7 +94,7 @@ def get_raw(files, repo):
     return ''.join(raw)
 
 #TODO: boost cache back up to 500
-@memoize("feed: %s", time=60)
+@memoize("feed: %s", time=600)
 def get_feed(username):
     """
     Uses the github gist API and constructs an RSS feed for it

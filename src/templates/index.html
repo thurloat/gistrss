@@ -20,7 +20,7 @@
 
 <div id="container">
 	<form method="post" action="/redir">
-		<div id="box">
+		<div class="box">
 		<p>Enter your GitHub username and I'll generate your Gist feed.</p>
 	    <input name="bleep_bloop" type="text" class="input-field" />
 	    <input type="image" src="/media/images/trans.png" id="submit" />
@@ -29,9 +29,26 @@
 		  Created by <a href="http://thurloat.com/">Adam Thurlow</a>, on
 		   <a href="http://appengine.google.com/">AppEngine</a>. My 
 		  <a href="http://gistrss.appspot.com/feed/thurloat">Gist feed</a>.
-		 
 	  </center>
 	</form>
+	<div class="box bottom">
+		<p>Top Generated Feeds (Updated Daily)</p>
+		<table>
+			<tr>
+				<td>1. <a href="/feed/thurloat">thurloat</a></td>
+				<td>2. <a href="/feed/kastner">kastner</a></td>
+			</tr>
+			<tr>
+				<td>3. <a href="/feed/minichate">minichate</a></td>
+				<td>4. <a href="/feed/defunkt">defunkt</a></td>
+			</tr>
+			<tr>
+				<td>5. <a href="/feed/ry">ry</a></td>
+				<td>6. <a href="/feed/dhh">dhh</a></td>
+			</tr>
+		</table>
+	</div>
+	
 </div><!--END CONTAINER-->
 
 </body>
