@@ -7,6 +7,9 @@ GistRSS - Generates a valid RSS/Atom feed for a github user's gist history.
 @contact: thurloat <at> gmail <dot> com
 """
 
+import logging
+import json
+
 from dateutil.parser import parse
 from google.appengine.api import memcache, urlfetch
 from pygments import highlight
@@ -14,18 +17,16 @@ from pygments.formatters import HtmlFormatter
 from pygments.formatters.html import escape_html
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from time import gmtime, strftime
-import jsonpickle
-import logging
-import urllib2
 
-jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
+DATE_FORMAT = "%a, %d %b %Y %H:%M:%S +0000"
+GIST_URL = "https://api.github.com/users/%s/gists"
 
 def memoize(keyformat, time=60):
-    """Decorator to memoize functions using memcache."""
+    """
+    Decorator to memoize functions using memcache.
+    """
     def decorator(fxn):
-        """Decorator fxn"""
         def wrapper(*args, **kwargs):
-            """wrapper that takes makes my key from the args"""
             key = keyformat % args[0:keyformat.count('%')]
             data = memcache.get(key)
             if data is not None:
@@ -37,123 +38,143 @@ def memoize(keyformat, time=60):
     return decorator
 
 #TODO: Optimize cache length
-@memoize("raw: %s %s", time=1200)
-def get_raw(files, repo):
+@memoize("raw: %s", time=1200)
+def get_raw(files):
     """
     Head to GitHub and get the raw content of the gist
-    
-    @return: excaped string of code
+
+    @param files - `files` key of the gist API response.
+    @return: some html to embed within the description of the RSS item.
     """
-    
+
     raw = []
     formatter = HtmlFormatter(noclasses=True)
-    for i in range(0, len(files) if len(files) < 6 else 5):
-        gist = files[i]
-        url = "http://gist.github.com/raw/%s/%s" % (repo, urllib2.quote(gist))
+
+    max_i = 5
+    for k, value in files.items():
+
+        max_i -= 1
+        if max_i is 0:
+            break
+
+        gist = value
+        url = gist['raw_url']
         try:
             result = urlfetch.fetch(url)
         except urlfetch.DownloadError:
+            # retry the download
             result = urlfetch.fetch(url)
             logging.error("Died on get_raw(%s)", url)
-            
-        raw.append("""
-            <table width='100%%'><tr><th style='background-color: #DDDDDD;'>
-            """)
-        raw.append("<h3><a href='%s'>%s</a></h3>" % (url, gist))
-        raw.append("</th></tr>")
+
         if result.status_code == 200:
-            raw.append("""
-                <tr><td style='background-color: ghostWhite; color: black'>
-                """)
-#TODO: DELETE CODES
-#            raw.append(u'<pre>')
-            #LEXERS
             try:
-                lexer = get_lexer_for_filename(gist)
+                lexer = get_lexer_for_filename(gist['filename'])
             except Exception:
-#                logging.error("%s", exc)
                 lexer = get_lexer_by_name('text')
-            pre_str = highlight(result.content 
-                                if len(result.content) < 3000 
-                                else "%s........" 
-                                    % result.content[0:2999], lexer, formatter)
-#TODO: DELETE CODES -- OLD      
-#            pre_str = unicode(
-#                              result.content 
-#                                if len(result.content) < 3000 
-#                                else "%s... more on github" 
-#                                    % result.content[0:2999], 
-#                              errors='ignore')
-#            raw.append(html_escape(pre_str))
-            raw.append(pre_str)
-#            raw.append(u'</pre>')
-            raw.append("</td></tr>")
-        raw.append("</table>")
-        raw.append("<hr />")
-            
+
+            c = result.content
+            content = "%s ....." % c[0:2999] if len(c) > 3000 else c 
+                                    
+            raw.append(FEED_GIST_TEMPLATE % {
+                "raw_url": url,
+                "filename": gist['filename'],
+                "rendered_codes": highlight(content, lexer, formatter)
+                })
+
     return ''.join(raw)
 
-#TODO: boost cache back up to 500
 @memoize("feed: %s", time=600)
 def get_feed(username):
     """
     Uses the github gist API and constructs an RSS feed for it
     """
-    
-    url = "http://gist.github.com/api/v1/json/gists/%s" % username
+
+    url = GIST_URL % username
     try:
         result = urlfetch.fetch(url)
     except urlfetch.DownloadError:
         result = urlfetch.fetch(url)
         logging.error("Died on get_feed(%s)", url)
-        
-    if result.status_code == 200 :
-        if result.content == 'error':
-            return 'error'
-        feed = []
-#        feed.append("""<?xml version="1.0" encoding="UTF-8"?>""")
-        feed.append("<rss version='2.0'>")
-        feed.append("<channel>")
-        feed.append("<title>%s's Gists</title>" 
-                    % username)
-        feed.append("<link>http://gist.github.com/%s</link>" 
-                    % username)
-        feed.append("""
-                    <description>A pretty RSS list of %s 's Github Gists</description>
-                    """ % username)
-        feed.append("<pubDate>%s</pubDate>" 
-                    % strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
-        obj = jsonpickle.decode(result.content)
-        for i in range(0, len(obj['gists']) if len(obj['gists']) < 10 else 10):
-            gist = obj['gists'][i]
-            date = parse(gist['created_at'])
-            feed.append("<item>")
-            feed.append("<author>%s</author>" % username)
-            feed.append("<title>%s</title>" % 
-                        escape_html(gist['description']
-                            if gist['description'] is not None 
-                            else ', '.join(gist['files'])))
-            feed.append("""
-                <description>
-                    <div style="width: 100%%;">
-                        <span style="float:right;"> posted: %s</span> 
-                        <b>gist</b>: <a href="%s">%s</a>
-                    </div>
-                    <hr />
-                    %s
-                </description>
-                """ % 
-                    (date.strftime('%b %d, %Y'),
-                     gist['repo'],
-                     gist['repo'],
-                     get_raw(gist['files'],gist['repo']),))
-            feed.append("<link>http://gist.github.com/%s</link>" % gist['repo'])
 
-            feed.append("<pubDate>%s</pubDate>"
-                        % date.strftime("%a, %d %b %Y %H:%M:%S +0000"))
-            feed.append("""
-                <comments>http://gist.github.com/%s#comments</comments>
-                """ % gist['repo'])
-            feed.append("</item>")
-        feed.append("</channel></rss>")
-        return ''.join(feed)
+    if result.status_code != 200 or result.content == 'error':
+        return 'error'
+
+    feed = [
+        FEED_HEAD_TEMPLATE % {
+            "username": username,
+            "pub_date": strftime(DATE_FORMAT, gmtime())
+        },
+    ]
+
+    obj = json.loads(result.content)
+
+    for i in range(0, len(obj) if len(obj) < 10 else 10):
+        gist = obj[i]
+        date = parse(gist['created_at'])
+        desc = gist['description']
+        title = escape_html(
+            ', '.join(
+                map(lambda f: f[1]['filename'], gist['files'].items())
+            ) if desc is None else desc)
+
+        feed.append(ITEM_TEMPLATE %
+            {
+                "id": gist['id'],
+                "author": username,
+                "title": title,
+                "post_date": date.strftime('%b %d, %Y'),
+                "gist_url": gist['html_url'],
+                "raw_gist": get_raw(gist['files']),
+                "pub_date": date.strftime(DATE_FORMAT),
+            }
+        )
+    feed.append(FEED_FOOT_TEMPLATE)
+    return ''.join(feed)
+
+FEED_HEAD_TEMPLATE = """
+<rss version="2.0">
+    <channel>
+        <title>%(username)s</title>
+        <link><http://gist.github.com/%(username)s/link>
+        <description>
+            A pretty RSS feed for %(username)s 's Github Gists
+        </description>
+        <pubDate>%(pub_date)s</pubDate>"""
+
+FEED_FOOT_TEMPLATE = """
+    </channel>
+</rss>"""
+
+ITEM_TEMPLATE = """
+<item>
+    <author>%(author)s</author>
+    <title>%(title)s</title>
+    <description>
+        <div style="width: 100%%;">
+        <span style="float:right;"> posted: %(post_date)s</span>
+        <b>gist</b>: <a href="%(gist_url)s">%(id)s</a>
+        </div>
+        <hr />
+        %(raw_gist)s
+    </description>
+    <link>%(gist_url)s</link>
+    <pubDate>%(pub_date)s</pubDate>
+    <comments>%(gist_url)s#comments</comments>
+</item>"""
+
+FEED_GIST_TEMPLATE = """
+<table width="100%%">
+    <tr>
+        <th style="background-color:#DDD;">
+            <h3>
+            <a href="%(raw_url)s">%(filename)s</a>
+            </h3>
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color:#F8F8F8;color:#000">
+            %(rendered_codes)s
+        </td>
+    </tr>
+</table>
+<hr />"""

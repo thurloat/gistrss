@@ -1,7 +1,9 @@
 application: gistrss
+
 version: pygments
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: true
 
 handlers:
 - url: /favicon.ico
@@ -16,4 +18,11 @@ handlers:
   static_dir: media
    
 - url: /.*
-  script: main.py
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+
+- name: jinja2
+  version: latest
