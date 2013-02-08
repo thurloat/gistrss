@@ -1,102 +1,128 @@
 
 body {
-margin:0;
-padding:0;
-background-color:#fff;
-background-image:url(/media/images/body-bg.jpg);
-background-repeat:repeat-x;
+    margin:0;
+    padding:0;
+    font-family:Helvetica, Arial, sans-serif;
+
+    background-color: #FAFAFA;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#FAFAFA), to(#FFF));
+    background-image: -webkit-linear-gradient(top, #FAFAFA, #FFF);
+    background-image:    -moz-linear-gradient(top, #FAFAFA, #FFF);
+    background-image:      -o-linear-gradient(top, #FAFAFA, #FFF);
+    background-image:         linear-gradient(to bottom, #FAFAFA, #FFF);
+        
 }
 
 div#container {
-width:419px;
-margin:0 auto;
+    width:419px;
+    margin:0 auto;
 }
 
 div.box {
-width:419px;
-float:left;
-height:151px;
-background-image:url(/media/images/main-bg.jpg);
-background-repeat:no-repeat;
-text-align:center;
-margin-top:200px;
+    width:419px;
+    float:left;
+    height:151px;
+    background-image:url(/media/images/main-bg.jpg);
+    background-repeat:no-repeat;
+    text-align:center;
+    margin-top:200px;
+    color: #555;
 }
 div.bottom{
-margin-top: 50px;	
+    margin-top: 50px;	
 }
 div.box table{
-	width: 400px;
-	text-align: center;	
-	padding: 10px;
+    width: 400px;
+    text-align: center;	
+    padding: 10px;
 }
 div.box td{
-	padding: 10px;	
+    padding: 10px;	
 }
 
 div.box input.input-field {
-width:324px;
-height:29px;
-float:left;
-border:none;
-background-image:url(/media/images/input-bg.jpg);
-background-repeat:no-repeat;
-padding:0 0 0 5px;
-margin:33px 0 20px 44px;
-font-family:Helvetica, Arial, sans-serif;
-font-weight:700;
-color:#fa9300;
-font-size:16px;
+    width:324px;
+    height:29px;
+    float:left;
+    border:none;
+    background-image:url(/media/images/input-bg.jpg);
+    background-repeat:no-repeat;
+    padding:0 0 0 5px;
+    margin:33px 0 20px 44px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-weight:700;
+    color:#B36F0F;
+    font-size:16px;
+}
+
+p.note {
+    margin: 0 auto;
+    text-align: center;
+    color: #555;
+    line-height: 40px;
+    font-size: 13px;
+}
+p.note a {
+    font-size: 14px;
 }
 
 #submit {
-display:block;
-width:88px;
-height:45px;
-text-decoration:none;
-overflow:hidden;
-background-image:url(/media/images/go-btn.jpg);
-background-repeat:no-repeat;
-margin:0 auto;
-float:none!important;
+    display:block;
+    width:88px;
+    height:45px;
+    text-decoration:none;
+    overflow:hidden;
+    background-image:url(/media/images/go-btn.jpg);
+    background-repeat:no-repeat;
+    margin:0 auto;
+    float:none!important;
 }
 
 div#container a img {
-float:right;
-margin-top:3px;
+    float:right;
+    margin-top:3px;
 }
 
 #submit:hover {
-background-position:0 -45px;
+    background-position:0 -45px;
 }
 
 #submit:active {
-background-position:0 -44px;
+    background-position:0 -44px;
 }
 
 #submit {
-border:none;
+    border:none;
 }
+
 div.box p{
-position:relative;
-top:-22px;
-left:0;
-height:0px;
-margin:0;
-padding:0;
-color:#a0a0a0;
-font-size:14px;
-font-family:Helvetica, Arial, sans-serif;
-font-weight:700;
+    position:relative;
+    top:-22px;
+    left:0;
+    height:0px;
+    margin:0;
+    padding:0;
+    color:#a0a0a0;
+    font-size:14px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-weight:700;
 }
 
 a {
-color:#fa9300;
-font-size:14px;
-font-weight:700;
-font-family:Helvetica, Arial, sans-serif;
-outline: none;
+    color:#B36F0F;
+    font-size:14px;
+    font-weight:700;
+    font-family:Helvetica, Arial, sans-serif;
+    outline: none;
+    text-decoration: none;
+
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
 }
 
 a:hover {
-color:#a0a0a0;
+    color: #F49D25;
+    text-decoration: underline;
 }
