@@ -1,4 +1,4 @@
-application: gistrss
+application: gistrss-hrd
 
 version: pygments
 runtime: python27
