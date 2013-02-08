@@ -135,7 +135,7 @@ FEED_HEAD_TEMPLATE = """
 <rss version="2.0">
     <channel>
         <title>%(username)s</title>
-        <link><http://gist.github.com/%(username)s/link>
+        <link>http://gist.github.com/%(username)s</link>
         <description>
             A pretty RSS feed for %(username)s 's Github Gists
         </description>
